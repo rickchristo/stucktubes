@@ -1,0 +1,5 @@
+//This header acts as a bridge between CMakeLists.txt files and .cpp files so
+//that we can display accurate version numbers to end-users.
+
+#define VERSION_MAJOR @StuckTubes_VERSION_MAJOR@
+#define VERSION_MINOR @StuckTubes_VERSION_MINOR@
