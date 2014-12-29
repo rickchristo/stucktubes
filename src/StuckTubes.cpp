@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 using namespace std;
 
 #include <opencv2/core.hpp>
@@ -21,23 +22,47 @@ int main(int argc, char* argv[])
     }
 
     Mat frame;
+    Mat edges;
     Mat fgMask;
     Mat bgModel;
-    Ptr<BackgroundSubtractorMOG2> const pMOG = createBackgroundSubtractorMOG2();
-    namedWindow("Background Model", 1);
+    Mat fgMask2;
+    Mat bgModel2;
+    istringstream ss(argv[1]);
+    int history;
+    if (!(ss >> history))
+    {
+        cout << "Bad command line input." << endl;
+    }
+    else if (history < 0)
+    {
+        cout << "Enter a history > 0." << endl;
+    }
+    Ptr<BackgroundSubtractorKNN> const pKNN = createBackgroundSubtractorKNN(history);
+    Ptr<BackgroundSubtractorKNN> const pKNN2 = createBackgroundSubtractorKNN(history);
+    //namedWindow("Background Model", 1);
+    //namedWindow("Background Model 2", 1);
     namedWindow("Foreground Mask", 1);
-    namedWindow("Webcam", 1);
+    namedWindow("Foreground Mask 2", 1);
+    //namedWindow("Webcam", 1);
     
     while (waitKey(10) < 0)
     {
         webcam >> frame;
 
-        pMOG->apply(frame, fgMask);
-        pMOG->getBackgroundImage(bgModel);
+        //blur(frame, frame, Size(5, 5));
+        //Canny(frame, edges, 0, 30, 3);
 
-        imshow("Background Model", bgModel);
+        pKNN->apply(frame, fgMask);
+        //pKNN->apply(edges, fgMask);
+        pKNN->getBackgroundImage(bgModel);
+        pKNN2->apply(fgMask, fgMask2);
+        pKNN2->getBackgroundImage(bgModel2);
+
+        //imshow("Background Model", bgModel);
         imshow("Foreground Mask", fgMask);
-        imshow("Webcam", frame);
+        //imshow("Background Model 2", bgModel2);
+        imshow("Foreground Mask 2", fgMask2);
+        //imshow("Webcam", edges);
     }
 
     webcam.release();
