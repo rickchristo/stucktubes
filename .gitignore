@@ -2,11 +2,14 @@
 # public repo with some minor customizations.  At the very end is the Octocat's
 # .gitignore which is included for good measure.  This also has a handful of
 # project-specific ignore rules, which are listed first.  I realize some
-# entries are redundant, but I'm not worried about it.
+# entries are redundant, but I'm not worried about it.  I may clean this up
+# later, but for now it should not do any harm.
 
 #~~~~~~~~~~~~StuckTubes~~~~~~~~~~~~
-# Ignore Binary Directory
-bin/
+# Ignore build Directory
+build/
+# Ignore dataset Directory
+dataset/
 
 #~~~~~~~~~~~~CMake~~~~~~~~~~~~
 # Ignore generated CMake files

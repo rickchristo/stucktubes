@@ -3,6 +3,7 @@ using namespace std;
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
+#include <opencv2/video.hpp>
 #include <opencv2/highgui.hpp>
 using namespace cv;
 
@@ -20,16 +21,25 @@ int main(int argc, char* argv[])
     }
 
     Mat frame;
-    //namedWindow("Background Model", 1);
-    //namedWindow("Foreground Mask", 1);
-    namedWindow("Webcam Test", 1);
+    Mat fgMask;
+    Mat bgModel;
+    Ptr<BackgroundSubtractorMOG2> const pMOG = createBackgroundSubtractorMOG2();
+    namedWindow("Background Model", 1);
+    namedWindow("Foreground Mask", 1);
+    namedWindow("Webcam", 1);
+    
     while (waitKey(10) < 0)
     {
         webcam >> frame;
-        //imshow("Background Model", bgModel);
-        //imshow("Foreground Mask", fgMask);
-        imshow("Webcam Test", frame);
+
+        pMOG->apply(frame, fgMask);
+        pMOG->getBackgroundImage(bgModel);
+
+        imshow("Background Model", bgModel);
+        imshow("Foreground Mask", fgMask);
+        imshow("Webcam", frame);
     }
 
+    webcam.release();
     return 0;
 }
