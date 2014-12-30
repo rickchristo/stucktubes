@@ -14,10 +14,19 @@ int main(int argc, char* argv[])
 {
     cout << "StuckTubes v" << VERSION_MAJOR << "." << VERSION_MINOR << endl;
 
-    VideoCapture webcam(0);
-    if (!webcam.isOpened())
+    VideoCapture videoStream;
+    if (argc < 3)
     {
-        cout << "Could not open webcam stream.\n" << endl;
+        videoStream.open(0);
+    }
+    else
+    {
+        videoStream.open(argv[2]);
+    }
+
+    if (!videoStream.isOpened())
+    {
+        cout << "Could not open video stream." << endl;
         return -1;
     }
 
@@ -37,8 +46,8 @@ int main(int argc, char* argv[])
     {
         cout << "Enter a history > 0." << endl;
     }
-    Ptr<BackgroundSubtractorKNN> const pKNN = createBackgroundSubtractorKNN(history);
-    Ptr<BackgroundSubtractorKNN> const pKNN2 = createBackgroundSubtractorKNN(history);
+    Ptr<BackgroundSubtractorKNN> const pKNN = createBackgroundSubtractorKNN(history, 800.0, false);
+    Ptr<BackgroundSubtractorKNN> const pKNN2 = createBackgroundSubtractorKNN(history/5, 800.0, false);
     //namedWindow("Background Model", 1);
     //namedWindow("Background Model 2", 1);
     namedWindow("Foreground Mask", 1);
@@ -47,7 +56,10 @@ int main(int argc, char* argv[])
     
     while (waitKey(10) < 0)
     {
-        webcam >> frame;
+        videoStream >> frame;
+
+        pyrDown(frame, frame);
+        pyrDown(frame, frame);
 
         //blur(frame, frame, Size(5, 5));
         //Canny(frame, edges, 0, 30, 3);
@@ -65,6 +77,6 @@ int main(int argc, char* argv[])
         //imshow("Webcam", edges);
     }
 
-    webcam.release();
+    videoStream.release();
     return 0;
 }
