@@ -10,7 +10,7 @@ using namespace cv;
 
 #include "StuckTubesConfig.h"
 
-#define CONTOUR_AREA_THRESHOLD 10
+#define CONTOUR_AREA_THRESHOLD 250
 
 int main(int argc, char* argv[])
 {
@@ -67,19 +67,32 @@ int main(int argc, char* argv[])
         pyrDown(frame, frame);
         pyrDown(frame, frame);
 
+        cvtColor(frame, frame, COLOR_BGR2HSV);
+
         GaussianBlur(frame, blurredFrame, Size(5, 5), 50, 2);
+
         pKNN->apply(blurredFrame, fgMask);
         fgMask.copyTo(contourFrame);
 
         findContours(fgMask, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE,
                      Point(0, 0));
+
+        //calculate moments on the contours while the frame is still binary
+        //Moments contourMoments = moments(contours, true);
+        
         cvtColor(contourFrame, contourFrame, COLOR_GRAY2BGR);
 
         for (int ii = 0; ii < contours.size(); ++ii)
         {
             if (contourArea(contours[ii]) > CONTOUR_AREA_THRESHOLD)
             {
-                drawContours(contourFrame, contours, ii, Scalar(0, 255, 0), FILLED, 8, hierarchy, 0, Point());
+                //draw the contour in blue
+                drawContours(contourFrame, contours, ii, Scalar(255, 0, 0), FILLED, 8, hierarchy, 0, Point());
+                //draw the centroid in green
+                Moments contourMoments = moments(contours[ii]);
+                double centroidX = contourMoments.m10 / contourMoments.m00;
+                double centroidY = contourMoments.m01 / contourMoments.m00;
+                circle(contourFrame, Point((int)centroidX, (int)centroidY), 3, Scalar(0, 255, 0));
             }
         }
 
